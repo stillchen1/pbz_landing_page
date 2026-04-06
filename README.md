@@ -20,6 +20,7 @@ Built with an emphasis on performance, extreme visual fidelity, and robust user 
 ├── tracker.js              # GA4 Analytics wrapper module (PV, UV, Events)
 ├── style.css               # Comprehensive cinematic stylesheet
 ├── package.json            # Project dependencies and Vite scripts
+├── vite.config.js          # Vite configuration for deployment compatibility
 └── README.md
 ```
 
@@ -35,7 +36,7 @@ Instead of relying on heavy raster graphics, the project utilizes native CSS pro
 
 A dedicated object-oriented module handles web analytics cleanly without polluting the main business logic:
 1. **PageView & Unique Visitor (UV):** Fires a `page_view` immediately. It also drops a `pbz_uv_token` inside the browser's `localStorage` to simulate or support first-visit tokenization.
-2. **Behavioral Tracking:** Listens for clicks on the main CTA button and fires a distinct `join_discord_click` event containing button metadata. 
+2. **Behavioral Tracking (Global Catch-all):** Dynamically mounts listeners to any anchor tag referencing `discord.gg`. It captures the ID of the specific button clicked to separate primary vs. secondary CTA conversions before successfully dispatching the `join_discord_click` event.
    > *Note: Because the CTA opens in a new tab (`target="_blank"`), the `gtag` dataLayer push executes safely without the browser terminating the request prematurely.*
 
 ## 🚀 Getting Started
@@ -61,9 +62,12 @@ A dedicated object-oriented module handles web analytics cleanly without polluti
    ```
    *The optimized static output will be generated inside the `/dist` directory.*
 
+## ☁️ Deployment Notes
+
+- **Cloudflare Pages / Workers**: The included base `vite.config.js` is intentionally provided to satisfy `wrangler`'s automated CI/CD injection requirements. Without it, Cloudflare deployments may fail with a config error.
+
 ## 💡 Pre-Launch Checklist
 
-Before deploying this to production, ensure you complete the following:
+Before pushing heavy traffic to this page, ensure you complete the following:
 - [ ] **GA4 Configuration:** Open `tracker.js` and replace `G-XXXXXXXXXX` with the official Google Analytics 4 Measurement ID.
-- [ ] **Asset Verification:** Ensure all referenced background images (e.g. `bg.webp`) are thoroughly compressed and optimized.
-- [ ] **SEO Validation:** Verify that `index.html` meta tags are accurate for social sharing previews (OpenGraph/Twitter Cards could be added).
+- [ ] **SEO Validation:** Double-check that the configured OpenGraph and Twitter Card metadata headers in `index.html` render as intended on Discord/Twitter link scrapers.
