@@ -4,17 +4,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize Analytics (Fires PV and evaluates UV)
   tracker.init();
 
-  // 2. Attach Click Listeners
-  const discordBtn = document.getElementById('discord-join-btn');
+  // 2. Attach Click Listeners to ALL Discord buttons
+  const discordLinks = document.querySelectorAll('a[href*="discord.gg"]');
   
-  if (discordBtn) {
-    discordBtn.addEventListener('click', (e) => {
+  discordLinks.forEach(link => {
+    link.addEventListener('click', () => {
       // It's a real link so we will let it navigate, 
       // but send beacon/event right before
       tracker.trackEvent('join_discord_click', {
-        button_id: 'discord-join-btn',
-        destination_url: discordBtn.href
+        button_id: link.id || 'secondary-discord-btn',
+        destination_url: link.href
       });
     });
-  }
+  });
 });
