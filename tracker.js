@@ -5,13 +5,13 @@
 
 class AnalyticsTracker {
   constructor() {
-    this.measurementId = 'G-XXXXXXXXXX'; // Replace with real GA4 Measurement ID
+    this.measurementId = 'G-865MN3Y5JT'; // Replace with real GA4 Measurement ID
     this.initialized = false;
   }
 
   init() {
     if (this.initialized) return;
-    
+
     // Inject GA4 Script
     const script = document.createElement('script');
     script.async = true;
@@ -20,20 +20,20 @@ class AnalyticsTracker {
 
     // Initialize dataLayer
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function() {
+    window.gtag = function () {
       window.dataLayer.push(arguments);
     }
-    
+
     window.gtag('js', new Date());
     window.gtag('config', this.measurementId, {
       send_page_view: false // We handle pageview manually below if we need extra custom dims
     });
 
     this.initialized = true;
-    
+
     // Process initial tracking
     this.trackPageView();
-    
+
     console.log('[Tracker] GA4 Initialized. Ready for Data Team implementation.');
   }
 
@@ -53,7 +53,7 @@ class AnalyticsTracker {
     if (!uvToken) {
       const freshToken = 'uv_' + Math.random().toString(36).substr(2, 9);
       localStorage.setItem('pbz_uv_token', freshToken);
-      
+
       // Fire custom first_visit event if needed
       if (window.gtag) {
         window.gtag('event', 'custom_unique_visit', {
