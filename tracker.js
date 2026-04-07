@@ -12,6 +12,9 @@ class AnalyticsTracker {
   init() {
     if (this.initialized) return;
 
+    // Capture UTM parameters from URL before initializing tracking
+    this.captureUTMParams();
+
     // Inject GA4 Script
     const script = document.createElement('script');
     script.async = true;
@@ -37,13 +40,34 @@ class AnalyticsTracker {
     console.log('[Tracker] GA4 Initialized. Ready for Data Team implementation.');
   }
 
+  captureUTMParams() {
+    const params = new URLSearchParams(window.location.search);
+    const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+    
+    let hasUTM = false;
+    utmParams.forEach(param => {
+      const value = params.get(param);
+      if (value) {
+        localStorage.setItem(`pbz_${param}`, value);
+        hasUTM = true;
+      }
+    });
+
+    if (hasUTM) {
+      console.log('[Tracker] Captured UTM parameters from URL.');
+    }
+  }
+
   trackPageView() {
     // Basic Page View
     if (window.gtag) {
       window.gtag('event', 'page_view', {
         page_title: document.title,
         page_location: window.location.href,
-        page_path: window.location.pathname
+        page_path: window.location.pathname,
+        utm_source: localStorage.getItem('pbz_utm_source') || undefined,
+        utm_medium: localStorage.getItem('pbz_utm_medium') || undefined,
+        utm_campaign: localStorage.getItem('pbz_utm_campaign') || undefined
       });
       console.log('[Tracker] Tracked Page View (PV)');
     }
@@ -68,8 +92,20 @@ class AnalyticsTracker {
 
   trackEvent(eventName, eventParameters = {}) {
     if (window.gtag) {
-      window.gtag('event', eventName, eventParameters);
-      console.log(`[Tracker] Tracked Event: ${eventName}`, eventParameters);
+      // 自动从缓存中读取当前用户的来源参数并绑定到各种交互事件上
+      const utmSources = {
+        utm_source: localStorage.getItem('pbz_utm_source') || undefined,
+        utm_medium: localStorage.getItem('pbz_utm_medium') || undefined,
+        utm_campaign: localStorage.getItem('pbz_utm_campaign') || undefined,
+        utm_content: localStorage.getItem('pbz_utm_content') || undefined,
+        utm_term: localStorage.getItem('pbz_utm_term') || undefined
+      };
+      
+      // 合并事件数据与渠道来源数据
+      const payload = { ...utmSources, ...eventParameters };
+      
+      window.gtag('event', eventName, payload);
+      console.log(`[Tracker] Tracked Event: ${eventName}`, payload);
     }
   }
 }
