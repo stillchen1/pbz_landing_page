@@ -8,11 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const discordLinks = document.querySelectorAll('a[href*="discord.gg"]');
   
   discordLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      // It's a real link so we will let it navigate, 
-      // but send beacon/event right before
+    link.addEventListener('click', (e) => {
+      const bId = link.id || 'secondary-discord-btn';
+      console.log(`[Main] Button Clicked: ${bId}`);
+      
       tracker.trackEvent('join_discord_click', {
-        button_id: link.id || 'secondary-discord-btn',
+        button_id: bId,
         destination_url: link.href
       });
     });

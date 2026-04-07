@@ -92,20 +92,23 @@ class AnalyticsTracker {
 
   trackEvent(eventName, eventParameters = {}) {
     if (window.gtag) {
-      // 自动从缓存中读取当前用户的来源参数并绑定到各种交互事件上
       const utmSources = {
-        utm_source: localStorage.getItem('pbz_utm_source') || undefined,
-        utm_medium: localStorage.getItem('pbz_utm_medium') || undefined,
-        utm_campaign: localStorage.getItem('pbz_utm_campaign') || undefined,
-        utm_content: localStorage.getItem('pbz_utm_content') || undefined,
-        utm_term: localStorage.getItem('pbz_utm_term') || undefined
+        utm_source: localStorage.getItem('pbz_utm_source'),
+        utm_medium: localStorage.getItem('pbz_utm_medium'),
+        utm_campaign: localStorage.getItem('pbz_utm_campaign'),
+        utm_content: localStorage.getItem('pbz_utm_content'),
+        utm_term: localStorage.getItem('pbz_utm_term')
       };
       
-      // 合并事件数据与渠道来源数据
-      const payload = { ...utmSources, ...eventParameters };
+      const payload = { ...eventParameters };
+      Object.keys(utmSources).forEach(key => {
+        if (utmSources[key]) {
+          payload[key] = utmSources[key];
+        }
+      });
       
       window.gtag('event', eventName, payload);
-      console.log(`[Tracker] Tracked Event: ${eventName}`, payload);
+      console.log(`[Tracker] Event: ${eventName}`, payload);
     }
   }
 }
